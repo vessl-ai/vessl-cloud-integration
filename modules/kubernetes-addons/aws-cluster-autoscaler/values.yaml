@@ -1,0 +1,15 @@
+awsRegion: ${aws_region}
+
+autoDiscovery:
+  clusterName: ${eks_cluster_name}
+
+image:
+  tag: ${image_tag}
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 512Mi
