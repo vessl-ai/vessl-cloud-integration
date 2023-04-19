@@ -1,6 +1,6 @@
 provider "google" {
-  project = "buoyant-aloe-380111"
-  region  = "us-central1"
+  project = "<GCP_PROJECT_ID>"
+  region  = "<GCP_REGION>"
 }
 
 data "google_client_config" "provider" {}
