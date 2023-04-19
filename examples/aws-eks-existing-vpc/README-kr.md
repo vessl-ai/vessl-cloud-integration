@@ -25,7 +25,7 @@
 
 이 예제에서는 AWS S3를 Terraform 백엔드로 사용합니다. 하지만 Terraform에서 지원하는 다른 백엔드를 사용할 수 있습니다. 자세한 내용은 [Terraform 백엔드 구성 문서](https://www.terraform.io/docs/language/settings/backends/index.html)를 참고하세요.
 
-백엔드 구성 파일을 수정하려면 이 예제의 루트 디렉토리로 이동하여 `terraform.tfbackends` 파일을 엽니다. 파일의 내용을 다음과 같이 사용자 환경에 맞게 수정합니다:
+백엔드 구성 파일을 수정하려면 이 예제의 루트 디렉토리로 이동하여 `terraform.tfbackend` 파일을 엽니다. 파일의 내용을 다음과 같이 사용자 환경에 맞게 수정합니다:
 ```hcl
 region = "<AWS_REGION_HERE>"
 bucket = "<AWS_BUCKET_TO_STORE_TERRAFORM_STATE>"
@@ -49,7 +49,7 @@ key = "<테라폼_상태_파일_이름>"
 
 이 예제의 루트 디렉토리로 이동하여 다음 명령을 실행하여 Terraform을 초기화합니다:
 ```bash
-terraform init -backend-config=terraform.tfbackends
+terraform init -backend-config=terraform.tfbackend
 ```
 
 ### 4. 리소스 프로비저닝

@@ -1,9 +1,3 @@
-resource "google_project_service" "google_container_api" {
-  project            = var.gcp_project_id
-  service            = "container.googleapis.com"
-  disable_on_destroy = false
-}
-
 data "google_container_engine_versions" "gke_version" {
   project        = var.gcp_project_id
   location       = var.location

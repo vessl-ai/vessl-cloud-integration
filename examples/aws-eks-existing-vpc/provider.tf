@@ -70,7 +70,7 @@ terraform {
   }
 
   backend "s3" {
-    # Remaining configuration omitted - see terraform.dev.tfbackend
+    # Remaining configuration omitted - see terraform.tfbackend
     encrypt = true
   }
 }

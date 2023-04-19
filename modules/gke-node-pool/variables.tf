@@ -47,13 +47,13 @@ variable "gpu" {
     {
       type           = string
       count          = string
-      partition_size = string
-      sharing_config = object(
+      partition_size = optional(string)
+      sharing_config = optional(object(
         {
           gpu_sharing_strategy       = string
           max_shared_clients_per_gpu = string
         }
-      )
+      ))
     }
   )
   description = <<EOT
