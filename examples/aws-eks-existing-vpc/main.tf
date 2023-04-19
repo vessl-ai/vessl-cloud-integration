@@ -7,7 +7,7 @@ locals {
 # EKS cluster (control plane)
 # ---------------------------
 module "eks" {
-  source = "github.com/vessl-ai/vessl-cloud-integration/modules/aws-eks-cluster"
+  source = "github.com/vessl-ai/vessl-cloud-integration//modules/aws-eks-cluster?ref=0.1.1"
 
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
@@ -49,7 +49,7 @@ locals {
 module "eks_self_managed_node_group" {
   for_each = local.availability_zone_subnets
 
-  source = "github.com/vessl-ai/vessl-cloud-integration/modules/eks-self-managed-node-group"
+  source = "github.com/vessl-ai/vessl-cloud-integration//modules/eks-self-managed-node-group?ref=0.1.1"
 
   instance_type = "t3.large"
   min_size      = 0
@@ -83,31 +83,31 @@ module "eks_self_managed_node_group" {
 # e.g. alb controller, autoscaler, cluster agent, etc.
 # ----------------------------------------------------
 module "addons_aws_load_balancer_controller" {
-  source           = "github.com/vessl-ai/vessl-cloud-integration/modules/kubernetes-addons/aws-load-balancer-controller"
+  source           = "github.com/vessl-ai/vessl-cloud-integration//modules/kubernetes-addons/aws-load-balancer-controller?ref=0.1.1"
   eks_cluster_name = module.eks.cluster_name
   oidc_issuer_url  = module.eks.oidc_issuer_url
 }
 
 module "addons_aws_cluster_autoscaler" {
-  source              = "github.com/vessl-ai/vessl-cloud-integration/modules/kubernetes-addons/aws-cluster-autoscaler"
+  source              = "github.com/vessl-ai/vessl-cloud-integration//modules/kubernetes-addons/aws-cluster-autoscaler?ref=0.1.1"
   eks_cluster_name    = module.eks.cluster_name
   eks_cluster_version = var.cluster_version
   oidc_issuer_url     = module.eks.oidc_issuer_url
 }
 
 module "addons_aws_ebs_csi_driver" {
-  source           = "github.com/vessl-ai/vessl-cloud-integration/modules/kubernetes-addons/aws-ebs-csi-driver"
+  source           = "github.com/vessl-ai/vessl-cloud-integration//modules/kubernetes-addons/aws-ebs-csi-driver?ref=0.1.1"
   eks_cluster_name = module.eks.cluster_name
   oidc_issuer_url  = module.eks.oidc_issuer_url
 }
 
 module "addons_nvidia_gpu_operator" {
-  source           = "github.com/vessl-ai/vessl-cloud-integration/modules/kubernetes-addons/nvidia-gpu-operator"
+  source           = "github.com/vessl-ai/vessl-cloud-integration//modules/kubernetes-addons/nvidia-gpu-operator?ref=0.1.1"
   eks_cluster_name = module.eks.cluster_name
 }
 
 module "addons_vessl_cluster_agent" {
-  source           = "github.com/vessl-ai/vessl-cloud-integration/modules/kubernetes-addons/vessl-cluster-agent"
+  source           = "github.com/vessl-ai/vessl-cloud-integration//modules/kubernetes-addons/vessl-cluster-agent?ref=0.1.1"
   eks_cluster_name = module.eks.cluster_name
   k8s_namespace    = var.cluster_agent_namespace
 

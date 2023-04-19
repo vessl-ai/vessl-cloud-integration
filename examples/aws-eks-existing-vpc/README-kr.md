@@ -86,7 +86,7 @@ EKS 클러스터에 새 노드 그룹을 추가하려면 `main.tf` 파일을 수
 module "eks_node_group_gpu_t4" {
   for_each = local.availability_zone_subnets
 
-  source = "github.com/vessl-ai/vessl-cloud-integration/modules/eks-self-managed-node-group"
+  source = "github.com/vessl-ai/vessl-cloud-integration//modules/eks-self-managed-node-group?ref=0.1.1"
 
   instance_type = "g4dn.large"
   min_size      = 0

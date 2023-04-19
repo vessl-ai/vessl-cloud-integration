@@ -87,7 +87,7 @@ For instance, to add a new node group that uses GPU instance types such as `g4dn
 module "eks_node_group_gpu_t4" {
   for_each = local.availability_zone_subnets
 
-  source = "github.com/vessl-ai/vessl-cloud-integration/modules/eks-self-managed-node-group"
+  source = "github.com/vessl-ai/vessl-cloud-integration//modules/eks-self-managed-node-group?ref=0.1.1"
 
   instance_type = "g4dn.large"
   min_size      = 0
