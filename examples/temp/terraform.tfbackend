@@ -1,0 +1,2 @@
+bucket = "vessl-terraform-states"
+prefix = "vessl-cluster-examples/gcp-gke-full.tfstate"
