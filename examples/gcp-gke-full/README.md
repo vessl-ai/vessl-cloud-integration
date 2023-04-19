@@ -17,7 +17,7 @@ The code provisions the following resources:
 
 ## Setup
 
-### 1. Define Terraform backend configuration
+### 1. Define Terraform provider configuration
 
 This example uses [Google Cloud Storage](https://developer.hashicorp.com/terraform/language/settings/backends/gcs) as a Terraform backend. However, you can use any other backend supported by Terraform. For more information, refer to the [Terraform backend configuration docs](https://www.terraform.io/docs/language/settings/backends/index.html).
 
@@ -25,6 +25,14 @@ To modify the backend configuration file, navigate to the root directory of this
 ```hcl
 bucket = "<GCS_BUCKET_TO_STORE_TERRAFORM_STATE>"
 prefix = "<TERRAFORM_STATE_FILE_NAME>"
+```
+
+Also in the `provider.tf` file, modify the `project` and `region` value in `google` provider block to match your environment as follows:
+```hcl
+provider "google" {
+  project = "<GCP_PROJECT_ID>"
+  region  = "us-central1"
+}
 ```
 
 ### 2. Set Terraform variables

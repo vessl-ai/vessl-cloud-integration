@@ -1,6 +1,6 @@
 provider "google" {
   project = "<GCP_PROJECT_ID>"
-  region  = "us-central1"
+  region  = "<GCP_REGION>"
 }
 
 data "google_client_config" "provider" {}

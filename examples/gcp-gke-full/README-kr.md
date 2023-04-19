@@ -28,6 +28,14 @@ bucket = "<GCS_BUCKET_TO_STORE_TERRAFORM_STATE>"
 prefix = "<TERRAFORM_STATE_FILE_NAME>"
 ```
 
+또한, `provider.tf` 파일을 열어 `project` 와 `region` 변수를 사용자 환경에 맞게 수정합니다:
+```hcl
+provider "google" {
+  project = "<GCP_PROJECT_ID>"
+  region  = "<GCP_REGION>"
+}
+```
+
 ### 2. Terraform 변수 설정
 
 이 예제에서는 리소스를 프로비저닝하기 위해 Google 제공자를 활용하며, 다음 변수가 필요합니다:
