@@ -1,5 +1,5 @@
 provider "google" {
-  project = "buoyant-aloe-380111"
+  project = "<GCP_PROJECT_ID>"
   region  = "us-central1"
 }
 

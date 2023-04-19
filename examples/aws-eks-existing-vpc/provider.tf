@@ -1,6 +1,6 @@
 provider "aws" {
-  profile = "tmap-gi-dev"
-  region  = "ap-northeast-2"
+  profile = "<AWS_PROFILE>"
+  region  = "<AWS_REGION>"
 }
 
 data "aws_region" "current" {}
