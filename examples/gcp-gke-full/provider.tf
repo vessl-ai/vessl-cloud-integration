@@ -1,12 +1,12 @@
 provider "google" {
-  project = "<GCP_PROJECT_ID>"
-  region  = "<GCP_REGION>"
+  project = "buoyant-aloe-380111"
+  region  = "us-central1"
 }
 
 data "google_client_config" "provider" {}
 
 provider "kubectl" {
-  host                   = "https://${module.gke_cluster.endpoint}"
+  host                   = "https://${module.gke_cluster.cluster_endpoint}"
   token                  = data.google_client_config.provider.access_token
   cluster_ca_certificate = module.gke_cluster.cluster_ca_certificate
 }

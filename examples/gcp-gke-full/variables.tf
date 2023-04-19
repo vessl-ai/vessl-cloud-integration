@@ -13,3 +13,13 @@ variable "network_name" {
   type        = string
   description = "The name of the VPC network"
 }
+
+variable "cluster_name" {
+  type        = string
+  description = "The name of the cluster"
+}
+
+variable "cluster_version" {
+  type        = string
+  description = "The version of the cluster"
+}
