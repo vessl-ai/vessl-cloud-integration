@@ -26,7 +26,7 @@ The code provisions the following resources on an existing AWS VPC:
 
 This example uses AWS S3 as a Terraform backend. However, you can use any other backend supported by Terraform. For more information, refer to the [Terraform backend configuration docs](https://www.terraform.io/docs/language/settings/backends/index.html).
 
-To modify the backend configuration file, navigate to the root directory of this example and open the `terraform.tfbackends` file. Modify the file's contents to match your environment as follows:
+To modify the backend configuration file, navigate to the root directory of this example and open the `terraform.tfbackend` file. Modify the file's contents to match your environment as follows:
 ```hcl
 region = "<AWS_REGION_HERE>"
 bucket = "<AWS_BUCKET_TO_STORE_TERRAFORM_STATE>"
@@ -50,7 +50,7 @@ To modify the variable file, navigate to the root directory of this example and 
 
 Navigate to the root directory of this example and run the following command to initialize Terraform:
 ```bash
-terraform init -backend-config=terraform.tfbackends
+terraform init -backend-config=terraform.tfbackend
 ```
 
 ### 4. Provision resources

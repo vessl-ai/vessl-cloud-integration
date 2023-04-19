@@ -1,6 +1,6 @@
 provider "aws" {
-  profile = "tmap-gi-dev"
-  region  = "ap-northeast-2"
+  profile = "<AWS_PROFILE>"
+  region  = "<AWS_REGION>"
 }
 
 data "aws_region" "current" {}
@@ -70,7 +70,7 @@ terraform {
   }
 
   backend "s3" {
-    # Remaining configuration omitted - see terraform.dev.tfbackend
+    # Remaining configuration omitted - see terraform.tfbackend
     encrypt = true
   }
 }
