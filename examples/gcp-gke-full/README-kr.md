@@ -59,3 +59,10 @@ terraform init -backend-config=terraform.tfbackend
 ```bash
 terraform apply
 ```
+
+### 5. 리소스 삭제
+
+예제를 완료한 후 다음 명령어를 실행하여 리소스를 삭제할 수 있습니다:
+```bash
+terraform destroy
+```

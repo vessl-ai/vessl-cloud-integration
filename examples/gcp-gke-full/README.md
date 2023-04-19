@@ -59,68 +59,7 @@ Navigate to the same directory and run the following command to provision resour
 terraform apply
 ```
 
-### 5. Verify cluster has connected to VESSL
-
-Go to https://vessl.ai/{your-organization-name}/clusters to verify that the cluster has connected to VESSL. When cluster has connected successfully, you can see the cluster name and the number of nodes in the cluster dashboard.
-
-If the cluster doesn't show up in the dashboard, you can check the logs of the VESSL agent to see if there are any errors. To check the logs, you must first be able to connect to a provisioned Kubernetes cluster.
-
-Run the following command to obtain the kubeconfig to connect to the cluster:
-```bash
-aws eks --region <AWS_REGION_HERE> update-kubeconfig --name <EKS_CLUSTER_NAME_HERE>
-```
-
-Once you have the Kubeconfig, run the following [kubectl](https://kubernetes.io/docs/reference/kubectl/) command:
-```bash
-# Replace 'vessl' with the namespace you specified in the 'terraform.tfvars' file
-kubectl logs -f --tail=30 deployment/vessl-cluster-agent -n vessl
-```
-
-### 6. Add a new node group
-
-To include a new node group in your EKS cluster, you can modify the `main.tf` file and add the `eks-self-managed-node-group` module.
-
-For instance, to add a new node group that uses GPU instance types such as `g4dn.xlarge`, you can add the following code to the `main.tf` file:
-
-```hcl
-module "eks_node_group_gpu_t4" {
-  for_each = local.availability_zone_subnets
-
-  source = "github.com/vessl-ai/vessl-cloud-integration//modules/eks-self-managed-node-group?ref=0.1.1"
-
-  instance_type = "g4dn.large"
-  min_size      = 0
-  max_size      = 10
-
-  cluster_name                       = module.eks.cluster_name
-  cluster_version                    = module.eks.cluster_version
-  cluster_endpoint                   = module.eks.cluster_endpoint
-  cluster_certificate_authority_data = module.eks.cluster_certificate_authority_data
-
-  security_group_ids = [
-    module.eks.cluster_primary_security_group_id,
-    module.eks.cluster_security_group_id,
-  ]
-  availability_zone        = each.key
-  subnet_ids               = each.value
-  iam_instance_profile_arn = module.eks.cluster_node_iam_instance_profile_arn
-
-  node_template_labels = {
-    "app.vessl.ai/v1.t4-1.mem-13" : "true",
-    "nvidia.com/gpu.product" : "Tesla-T4",
-    "k8s.amazonaws.com/accelerator" : "nvidia-tesla-t4"
-  }
-  node_template_resources = {
-    "nvidia.com/gpu" : "1",
-    "ephemeral-storage" : "100Gi"
-  }
-  tags = var.tags
-}
-```
-
-Note that `instance_type`, `node_template_labels`, and `node_template_resources` are modified to match the GPU instance type used in EKS and node labels used by cluster autoscaler.
-
-### 7. Destroying resources
+### 5. Destroying resources
 
 After you are done with the example, you can destroy the resources by running the following command:
 ```bash
