@@ -7,9 +7,7 @@ This project includes patterns and modules that can be used to create a [Kuberne
 The examples are listed below:
 
 **Amazon Web Services**
-* [(TBD) AWS EKS](examples/aws-eks-full)
 * [AWS EKS - Provisioning a Cluster to an Existing VPC](examples/aws-eks-existing-vpc)
 
 **Google Cloud Platform**
-* [(TBD) GCP GKE](examples/gcp-gke-full)
-* [(TBD) GCP GKE - Provision a Cluster to an Existing VPC](examples/gcp-gke-existing-vpc)
+* [GCP GKE - Full example with VPC Network](examples/gcp-gke-full)

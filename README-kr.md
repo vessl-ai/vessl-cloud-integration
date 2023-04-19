@@ -7,9 +7,7 @@
 아래 예제들을 참고해주세요:
 
 **Amazon Web Services**
-* [(TBD) AWS EKS](examples/aws-eks-full)
 * [AWS EKS - 존재하는 VPC에 클러스터 프로비저닝](examples/aws-eks-existing-vpc)
 
 **Google Cloud Platform**
-* [(TBD) GCP GKE](examples/gcp-gke-full)
-* [(TBD) GCP GKE - 존재하는 VPC에 클러스터 프로비저닝](examples/gcp-gke-existing-vpc)
+* [GCP GKE - VPC Network에 클러스터 프로비저닝](examples/gcp-gke-full)
