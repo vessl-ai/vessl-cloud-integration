@@ -8,6 +8,12 @@ variable "name" {
   description = "The name of the network"
 }
 
+variable "region" {
+  type        = string
+  description = "The GCP region"
+  default     = "us-central1"
+}
+
 variable "auto_create_subnetworks" {
   type        = bool
   description = "Whether to create subnetworks automatically"

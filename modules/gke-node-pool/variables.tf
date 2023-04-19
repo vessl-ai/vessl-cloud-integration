@@ -8,6 +8,11 @@ variable "location" {
   description = "The location (region or zone) for the cluster"
 }
 
+variable "name" {
+  type        = string
+  description = "The name of the node pool"
+}
+
 variable "cluster_name" {
   type        = string
   description = "The name of the cluster"
@@ -67,5 +72,5 @@ variable "gpu" {
       }
     }
   EOT
-  default     = {}
+  default     = null
 }

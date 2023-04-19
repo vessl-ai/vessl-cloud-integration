@@ -1,12 +1,10 @@
 data "google_container_engine_versions" "gke_version" {
   project        = var.gcp_project_id
   location       = var.location
-  version_prefix = endswith(var.cluster.version, ".") ? var.cluster_version : "${var.cluster_version}."
+  version_prefix = endswith(var.cluster_version, ".") ? var.cluster_version : "${var.cluster_version}."
 }
 
-resource "google_container_cluster" "cluster" {
-  depends_on = [google_project_service.google_container_api]
-
+resource "google_container_cluster" "this" {
   network  = var.vpc_network_name
   name     = var.cluster_name
   location = var.location

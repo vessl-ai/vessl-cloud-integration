@@ -2,7 +2,7 @@ data "google_container_engine_versions" "gke_version" {
   project  = var.gcp_project_id
   location = var.location
 
-  version_prefix = endswith(var.cluster.version, ".") ? var.cluster_version : "${var.cluster_version}."
+  version_prefix = endswith(var.cluster_version, ".") ? var.cluster_version : "${var.cluster_version}."
 }
 
 resource "google_container_node_pool" "this" {
@@ -24,7 +24,7 @@ resource "google_container_node_pool" "this" {
 
     labels = {
       "vessl.ai/node-type" = var.machine_type
-      "vessl.ai/gpu-type"  = length(var.gpu) > 0 ? var.gpu.type : null
+      "vessl.ai/gpu-type"  = var.gpu == null ? null : var.gpu.type
     }
 
     oauth_scopes = [
@@ -38,12 +38,12 @@ resource "google_container_node_pool" "this" {
       "https://www.googleapis.com/auth/trace.append",
     ]
 
-    guest_accelerator = [
+    guest_accelerator = var.gpu == null ? null : [
       {
         type               = var.gpu.type
         count              = var.gpu.count
-        gpu_partition_size = var.gpu.partition_size
-        gpu_sharing_config = var.gpu.sharing_config
+        gpu_partition_size = null
+        gpu_sharing_config = null
       }
     ]
   }
