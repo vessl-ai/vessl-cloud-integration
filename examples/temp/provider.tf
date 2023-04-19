@@ -1,1 +1,0 @@
-../gcp-gke-full/provider.tf
