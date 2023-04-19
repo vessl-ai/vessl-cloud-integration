@@ -8,7 +8,7 @@ resource "google_project_service" "google_container_api" {
 # VPC Network
 # -----------
 module "gcp_vpc_network" {
-  source = "../../modules/gcp-vpc-network"
+  source = "github.com/vessl-ai/vessl-cloud-integrationmodules/gcp-vpc-network"
 
   gcp_project_id = var.gcp_project_id
   name           = var.network_name
@@ -20,7 +20,7 @@ module "gcp_vpc_network" {
 # ---------------------------
 module "gke_cluster" {
   depends_on = [google_project_service.google_container_api]
-  source     = "../../modules/gke-cluster"
+  source     = "github.com/vessl-ai/vessl-cloud-integrationmodules/gke-cluster"
 
   gcp_project_id  = var.gcp_project_id
   cluster_name    = var.cluster_name
@@ -35,7 +35,7 @@ module "gke_cluster" {
 # ---------------------------
 module "gke_node_pool_n1hm4_v100_1" {
   depends_on = [google_project_service.google_container_api]
-  source     = "../../modules/gke-node-pool"
+  source     = "github.com/vessl-ai/vessl-cloud-integrationmodules/gke-node-pool"
 
   gcp_project_id = var.gcp_project_id
   location       = var.region
@@ -61,7 +61,7 @@ module "gke_node_pool_n1hm4_v100_1" {
 # e.g. alb controller, autoscaler, cluster agent, etc.
 # ----------------------------------------------------
 module "addons_gcp_nvidia_driver_installer" {
-  source = "../../modules/kubernetes-addons/gcp-nvidia-driver-installer"
+  source = "github.com/vessl-ai/vessl-cloud-integrationmodules/kubernetes-addons/gcp-nvidia-driver-installer"
 
   cluster_name = var.cluster_name
   region       = var.region
