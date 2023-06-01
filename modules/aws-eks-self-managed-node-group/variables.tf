@@ -67,6 +67,12 @@ variable "node_template_resources" {
   default     = {}
 }
 
+variable "taints" {
+  type        = list(string)
+  description = "The taints to apply to the node group"
+  default     = []
+}
+
 variable "min_size" {
   type        = number
   description = "The minimum number of nodes to run in the node group"

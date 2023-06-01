@@ -13,7 +13,11 @@ module "node_group" {
   launch_template_name = local.node_group_name
   ami_id               = var.ami_id
   instance_type        = var.instance_type
-  bootstrap_extra_args = length(var.node_template_labels) > 0 ? "--kubelet-extra-args '--node-labels=${join(",", [for k, v in var.node_template_labels : "${k}=${v}"])}'" : ""
+  bootstrap_extra_args = length(var.node_template_labels) == 0 ? "" : join(" ", [
+    "--kubelet-extra-args",
+    "--node-labels=${join(",", [for k, v in var.node_template_labels : "${k}=${v}"])}",
+    length(var.taints) == 0 ? "" : "--register-with-taints=${join(",", var.taints)}",
+  ])
 
   cluster_name        = var.cluster_name
   cluster_version     = var.cluster_version
