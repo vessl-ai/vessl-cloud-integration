@@ -102,8 +102,19 @@ module "addons_aws_ebs_csi_driver" {
 }
 
 module "addons_nvidia_gpu_operator" {
-  source           = "github.com/vessl-ai/vessl-cloud-integration//modules/kubernetes-addons/nvidia-gpu-operator?ref=0.1.1"
+  source           = "github.com/vessl-ai/vessl-cloud-integration//modules/kubernetes-addons/nvidia-gpu-operator?ref=0.1.4"
   eks_cluster_name = module.eks.cluster_name
+
+  helm_values_force_string = {
+    # Disable launching Pod 'nvidia-device-plugin-validator', which briefly occupies a GPU and
+    # thus has a race condition with pending GPU workloads when a node is created by cluster scale-up.
+    # cf.: NVIDIA/gpu-operator#140, NVIDIA/gpu-operator#475
+    #
+    # Plain "false" in helm_values will result in YAML false of type boolean which
+    # then triggers error in K8s API; force the value as string.
+    "validator.plugin.env[0].name"  = "WITH_WORKLOAD"
+    "validator.plugin.env[0].value" = "false"
+  }
 }
 
 module "addons_vessl_cluster_agent" {

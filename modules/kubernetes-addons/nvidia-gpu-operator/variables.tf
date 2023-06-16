@@ -1,7 +1,13 @@
 variable "helm_values" {
   type        = map(any)
   default     = {}
-  description = "Additional settings which will be passed to the Helm chart values.https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/Chart.yaml"
+  description = "Additional settings which will be passed to the Helm chart values. https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/Chart.yaml"
+}
+
+variable "helm_values_force_string" {
+  type        = map(any)
+  default     = {}
+  description = "Additional settings which will be passed to the Helm chart values. The values will be forced to string (see helm/helm#2848). https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/Chart.yaml"
 }
 
 variable "eks_cluster_name" {

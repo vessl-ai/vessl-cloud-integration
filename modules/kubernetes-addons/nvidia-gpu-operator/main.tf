@@ -39,6 +39,15 @@ resource "helm_release" "nvidia_gpu_operator" {
     }
   }
 
+  dynamic "set" {
+    for_each = var.helm_values_force_string
+    content {
+      name  = set.key
+      value = set.value
+      type  = "string"
+    }
+  }
+
   depends_on = [
     kubernetes_namespace_v1.nvidia_gpu_operator
   ]
