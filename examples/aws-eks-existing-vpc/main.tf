@@ -49,10 +49,10 @@ locals {
 module "eks_self_managed_node_group" {
   for_each = local.availability_zone_subnets
 
-  source = "github.com/vessl-ai/vessl-cloud-integration//modules/eks-self-managed-node-group?ref=0.1.1"
+  source = "github.com/vessl-ai/vessl-cloud-integration//modules/aws-eks-self-managed-node-group?ref=0.1.1"
 
   instance_type = "t3.large"
-  min_size      = 0
+  min_size      = 1
   max_size      = 10
 
   cluster_name                       = module.eks.cluster_name

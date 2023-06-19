@@ -1,6 +1,5 @@
 provider "aws" {
-  profile = "<AWS_PROFILE>"
-  region  = "<AWS_REGION>"
+  region = var.region
 }
 
 data "aws_region" "current" {}

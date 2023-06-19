@@ -36,7 +36,7 @@ resource "helm_release" "vessl_cluster_agent" {
 
   set {
     name  = "agent.clusterName"
-    value = var.eks_cluster_name
+    value = var.cluster_name
   }
 
   set {

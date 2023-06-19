@@ -4,7 +4,7 @@ variable "helm_values" {
   description = "Additional settings which will be passed to the Helm chart values."
 }
 
-variable "eks_cluster_name" {
+variable "cluster_name" {
   type        = string
   description = "The name of the cluster to install addon."
 }

@@ -23,3 +23,18 @@ variable "cluster_version" {
   type        = string
   description = "The version of the cluster"
 }
+
+variable "cluster_agent_namespace" {
+  type        = string
+  description = "The namespace where VESSL cluster agent will be installed"
+}
+
+variable "local_storage_class_name" {
+  type        = string
+  description = "The name of the local storage class to use for the cluster"
+}
+
+variable "vessl_agent_access_token" {
+  type        = string
+  description = "The access token for the VESSL cluster agent"
+}
