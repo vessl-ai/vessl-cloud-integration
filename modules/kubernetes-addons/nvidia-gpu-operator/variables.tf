@@ -42,12 +42,12 @@ variable "helm_release_name" {
 variable "k8s_create_namespace" {
   type        = bool
   default     = true
-  description = "Whether to create k8s namespace with name defined by `k8s_namespace`"
+  description = "Whether to create a k8s namespace with name defined by `k8s_namespace` if such namespace does not exist"
 }
 
 variable "k8s_namespace" {
   type        = string
-  default     = "nvidia-gpu-operator"
+  default     = "vessl"
   description = "The k8s namespace in which the nvidia-gpu-operator service account has been created"
 }
 
