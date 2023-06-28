@@ -1,20 +1,11 @@
-resource "kubernetes_namespace_v1" "nvidia_gpu_operator" {
-  metadata {
-    name = var.k8s_namespace
-  }
-
-  timeouts {
-    delete = "15m"
-  }
-}
-
 resource "helm_release" "nvidia_gpu_operator" {
   repository = var.helm_repo_url
   chart      = var.helm_chart_name
 
-  namespace = var.k8s_namespace
-  name      = var.helm_release_name
-  version   = var.helm_chart_version
+  namespace        = var.k8s_namespace
+  name             = var.helm_release_name
+  version          = var.helm_chart_version
+  create_namespace = var.k8s_create_namespace
 
   set {
     name  = "serviceAccount.create"
@@ -47,8 +38,4 @@ resource "helm_release" "nvidia_gpu_operator" {
       type  = "string"
     }
   }
-
-  depends_on = [
-    kubernetes_namespace_v1.nvidia_gpu_operator
-  ]
 }
