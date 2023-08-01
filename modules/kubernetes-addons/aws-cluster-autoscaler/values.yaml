@@ -13,3 +13,16 @@ resources:
   requests:
     cpu: 200m
     memory: 512Mi
+%{ if length(node_selectors) > 0 }
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+%{~ for term in node_selectors }
+            - key: ${ term.key }
+              operator: "In"
+              values:
+                - ${ term.value }
+%{~ endfor }
+%{ endif }

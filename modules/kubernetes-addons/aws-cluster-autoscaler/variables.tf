@@ -55,6 +55,15 @@ variable "k8s_namespace" {
   description = "The k8s namespace in which the cluster-autoscaler service account has been created"
 }
 
+variable "k8s_node_selectors" {
+  type = list(object({
+    key   = string
+    value = string
+  }))
+  default = []
+  description = "Node selector for cluster-autoscaler, in label key-value pairs."
+}
+
 variable "k8s_service_account_name" {
   type        = string
   default     = "cluster-autoscaler"
