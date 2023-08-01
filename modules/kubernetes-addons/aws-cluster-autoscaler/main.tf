@@ -12,6 +12,7 @@ resource "helm_release" "cluster_autoscaler" {
     aws_region       = data.aws_region.current.name
     eks_cluster_name = var.eks_cluster_name
     image_tag        = "v${var.eks_cluster_version}.0"
+    node_selectors   = var.k8s_node_selectors
   })]
 
   set {
