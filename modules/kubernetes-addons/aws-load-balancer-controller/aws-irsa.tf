@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "aws_load_balancer_controller_irsa" {
 # ----------------------------------------------------
 # IAM policy for aws-load-balancer-controller IAM role
 # ----------------------------------------------------
-# https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/v2.4.6/docs/install/iam_policy.json
+# https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/v2.5.4/docs/install/iam_policy.json
 resource "aws_iam_policy" "aws_load_balancer_controller" {
   name        = "${var.eks_cluster_name}-${var.helm_release_name}"
   path        = "/"
