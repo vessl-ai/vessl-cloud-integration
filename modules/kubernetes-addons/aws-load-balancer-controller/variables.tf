@@ -28,7 +28,7 @@ variable "helm_chart_name" {
 
 variable "helm_chart_version" {
   type        = string
-  default     = "1.4.7"
+  default     = "1.5.5"
   description = "The Helm chart version for aws-load-balancer-controller"
 }
 
