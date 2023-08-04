@@ -42,7 +42,7 @@ resource "aws_iam_policy" "aws_load_balancer_controller" {
   name        = "${var.eks_cluster_name}-${var.helm_release_name}"
   path        = "/"
   description = "AWS IAM Policy for the Kubernetes service account ${var.k8s_namespace}:${var.k8s_service_account_name}"
-  policy      = file("aws_load_balancer_controller_iam_policy.json")
+  policy      = file("${path.module}/aws_load_balancer_controller_iam_policy.json")
 }
 
 resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller" {
