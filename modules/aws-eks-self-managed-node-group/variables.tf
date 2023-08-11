@@ -91,6 +91,12 @@ variable "desired_size" {
   default     = 0
 }
 
+variable "instance_market_options" {
+  type        = map(any)
+  description = "The market (purchasing) option for the instances"
+  default     = {}
+}
+
 variable "tags" {
   type        = map(string)
   description = "The tags to apply to the node group"

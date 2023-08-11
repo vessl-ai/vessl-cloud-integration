@@ -35,9 +35,10 @@ module "node_group" {
   // Without it, the security groups of the nodes are empty and thus won't join the cluster.
   vpc_security_group_ids = var.security_group_ids
 
-  min_size     = var.min_size
-  max_size     = var.max_size
-  desired_size = var.desired_size
+  min_size                = var.min_size
+  max_size                = var.max_size
+  desired_size            = var.desired_size
+  instance_market_options = var.instance_market_options
 
   # Pre-propagate necessary k8s node labels to autoscaling group tags in order to implement scale-to-zero
   # https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md#how-can-i-scale-a-node-group-to-0
