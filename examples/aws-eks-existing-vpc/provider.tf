@@ -1,9 +1,8 @@
-provider "aws" {
-  profile = "<AWS_PROFILE>"
-  region  = "<AWS_REGION>"
-}
+provider "aws" {}
 
 data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
+data "aws_partition" "current" {}
 
 # # Caveat: Use data source instead of module output, since k8s provider isn't receiving a configuration from module output
 # # See also:
@@ -69,8 +68,5 @@ terraform {
     }
   }
 
-  backend "s3" {
-    # Remaining configuration omitted - see terraform.tfbackend
-    encrypt = true
-  }
+  backend "local" {}
 }

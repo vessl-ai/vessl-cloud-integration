@@ -1,32 +1,11 @@
-locals {
-  private_subnet_ids = values(var.private_subnets)
-  public_subnet_ids  = values(var.public_subnets)
-}
+data "aws_ami" "eks_cpu" {
+  filter {
+    name   = "name"
+    values = ["amazon-eks-node-${var.cluster_version}-v*"]
+  }
 
-# ---------------------------
-# EKS cluster (control plane)
-# ---------------------------
-module "eks" {
-  source = "github.com/vessl-ai/vessl-cloud-integration//modules/aws-eks-cluster?ref=0.1.1"
-
-  cluster_name    = var.cluster_name
-  cluster_version = var.cluster_version
-
-  vpc_id     = var.vpc_id
-  subnet_ids = concat(local.private_subnet_ids, local.public_subnet_ids)
-
-  cluster_master_iam_users = var.cluster_master_iam_users
-  cluster_master_iam_roles = var.cluster_master_iam_roles
-
-  tags = var.tags
-}
-
-# -------------------------------------------------------------
-# EKS self-managed node groups (one per each availability zone)
-# -------------------------------------------------------------
-data "aws_subnet" "public_subnets" {
-  for_each = toset(local.public_subnet_ids)
-  id       = each.key
+  most_recent = true
+  owners      = ["amazon"]
 }
 
 data "aws_ami" "eks_gpu" {
@@ -40,103 +19,167 @@ data "aws_ami" "eks_gpu" {
 }
 
 locals {
-  # Group subnets by availability zone
-  availability_zone_subnets = {
-    for s in data.aws_subnet.public_subnets : s.availability_zone => s.id...
-  }
+  private_subnet_ids = values(var.private_subnets)
+  public_subnet_ids  = values(var.public_subnets)
 }
 
-module "eks_self_managed_node_group" {
-  for_each = local.availability_zone_subnets
+# ---------------------------
+# IAM resources for EKS cluster nodes
+# ---------------------------
+module "eks_node_group_iam" {
+  source  = "vessl-ai/vessl-eks-node-group-iam/aws"
+  version = "0.0.2"
 
-  source = "github.com/vessl-ai/vessl-cloud-integration//modules/eks-self-managed-node-group?ref=0.1.1"
+  cluster_name = var.cluster_name
+  tags         = var.tags
+}
 
-  instance_type = "t3.large"
-  min_size      = 0
-  max_size      = 10
+# ---------------------------
+# EKS cluster (control plane)
+# ---------------------------
+module "eks" {
+  source                   = "terraform-aws-modules/eks/aws"
+  version                  = "19.17.2"
+  cluster_name             = var.cluster_name
+  cluster_version          = var.cluster_version
+  control_plane_subnet_ids = local.private_subnet_ids
+  subnet_ids               = local.private_subnet_ids
+  vpc_id                   = var.vpc_id
+  enable_irsa              = true
+
+  cluster_endpoint_public_access = true
+
+  create_aws_auth_configmap = true
+  manage_aws_auth_configmap = true
+
+  # IAM users to hold system:masters access
+  aws_auth_users = [
+    for user in var.cluster_master_iam_users : {
+      userarn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:user/${user}"
+      username = user
+      groups   = ["system:masters"]
+    }
+  ]
+
+  # IAM roles to hold system:masters access
+  aws_auth_roles = [
+    for username, role in var.cluster_master_iam_roles : {
+      rolearn  = replace(role, "/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}", "")
+      username = username
+      groups   = ["system:masters"]
+    }
+  ]
+
+  aws_auth_node_iam_role_arns_non_windows = [module.eks_node_group_iam.iam_role_arn]
+
+  tags = var.tags
+}
+
+# --------------------------------------
+# EKS self-managed node groups (workers)
+# --------------------------------------
+module "eks_node_groups" {
+  source  = "vessl-ai/vessl-eks-node-groups/aws"
+  version = "0.0.7"
 
   cluster_name                       = module.eks.cluster_name
   cluster_version                    = module.eks.cluster_version
   cluster_endpoint                   = module.eks.cluster_endpoint
   cluster_certificate_authority_data = module.eks.cluster_certificate_authority_data
 
+  vpc_id = var.vpc_id
   security_group_ids = [
     module.eks.cluster_primary_security_group_id,
     module.eks.cluster_security_group_id,
   ]
-  availability_zone        = each.key
-  subnet_ids               = each.value
-  iam_instance_profile_arn = module.eks.cluster_node_iam_instance_profile_arn
 
-  node_template_labels = {
-    "app.vessl.ai/v1.cpu-1.mem-4" : "true",
-    "app.vessl.ai/v1.cpu-2.mem-8" : "true",
+  manager_node_count         = 1
+  manager_node_ami_id        = data.aws_ami.eks_cpu.id
+  manager_node_instance_type = "m6i.large"
+  manager_node_disk_size     = 100
+  manager_node_subnet_ids    = local.public_subnet_ids
+
+  iam_instance_profile_arn = module.eks_node_group_iam.iam_instance_profile_arn
+
+  self_managed_node_groups_data = {
+    "t4-1" : {
+      min_size          = 0
+      max_size          = 1
+      desired_size      = 1
+      instance_type     = "g4dn.xlarge"
+      name              = "t4-1"
+      subnet_ids        = [local.private_subnet_ids[0]]
+      disk_size         = 500
+      availability_zone = "us-east-1a"
+      ami_id            = data.aws_ami.eks_gpu.id
+      node_template_resources = {
+        ephemeral-storage = "500Gi"
+      }
+    }
   }
-  node_template_resources = {
-    "ephemeral-storage" : "100Gi"
-  }
+
   tags = var.tags
 }
 
-# ----------------------------------------------------
-# Kubernetes addons
-# e.g. alb controller, autoscaler, cluster agent, etc.
-# ----------------------------------------------------
-module "addons_aws_load_balancer_controller" {
-  source           = "github.com/vessl-ai/vessl-cloud-integration//modules/kubernetes-addons/aws-load-balancer-controller?ref=0.1.1"
-  eks_cluster_name = module.eks.cluster_name
-  oidc_issuer_url  = module.eks.oidc_issuer_url
-}
+module "eks_addons" {
+  depends_on = [module.eks_node_groups]
 
-module "addons_aws_cluster_autoscaler" {
-  source              = "github.com/vessl-ai/vessl-cloud-integration//modules/kubernetes-addons/aws-cluster-autoscaler?ref=0.1.1"
-  eks_cluster_name    = module.eks.cluster_name
-  eks_cluster_version = var.cluster_version
-  oidc_issuer_url     = module.eks.oidc_issuer_url
-}
+  source  = "vessl-ai/vessl-eks-addons/aws"
+  version = "0.0.16"
 
-module "addons_aws_ebs_csi_driver" {
-  source           = "github.com/vessl-ai/vessl-cloud-integration//modules/kubernetes-addons/aws-ebs-csi-driver?ref=0.1.1"
-  eks_cluster_name = module.eks.cluster_name
-  oidc_issuer_url  = module.eks.oidc_issuer_url
-}
+  cluster_name              = var.cluster_name
+  cluster_version           = var.cluster_version
+  cluster_oidc_issuer_url   = module.eks.cluster_oidc_issuer_url
+  cluster_oidc_provider_arn = module.eks.oidc_provider_arn
 
-module "addons_nvidia_gpu_operator" {
-  source           = "github.com/vessl-ai/vessl-cloud-integration//modules/kubernetes-addons/nvidia-gpu-operator?ref=0.1.4"
-  eks_cluster_name = module.eks.cluster_name
-
-  helm_values_force_string = {
-    # Disable launching Pod 'nvidia-device-plugin-validator', which briefly occupies a GPU and
-    # thus has a race condition with pending GPU workloads when a node is created by cluster scale-up.
-    # cf.: NVIDIA/gpu-operator#140, NVIDIA/gpu-operator#475
-    #
-    # Plain "false" in helm_values will result in YAML false of type boolean which
-    # then triggers error in K8s API; force the value as string.
-    "validator.plugin.env[0].name"  = "WITH_WORKLOAD"
-    "validator.plugin.env[0].value" = "false"
+  coredns = {
+    version = "v1.9.3-eksbuild.5"
   }
-}
-
-module "addons_vessl_cluster_agent" {
-  source           = "github.com/vessl-ai/vessl-cloud-integration//modules/kubernetes-addons/vessl-cluster-agent?ref=0.1.1"
-  eks_cluster_name = module.eks.cluster_name
-  k8s_namespace    = var.cluster_agent_namespace
-
-  vessl_cluster_agent_option = {
-    provider_type            = "aws"
-    vessl_agent_access_token = var.vessl_agent_access_token
-    local_storage_class_name = var.local_storage_class_name
-    environment              = "prod",
-    ingress_endpoint         = "",
-    log_level                = "info",
-    vessl_api_server         = "https://api.vessl.ai"
+  vpc_cni = {
+    version = "v1.13.2-eksbuild.1"
+  }
+  kube_proxy = {
+    version = "v1.25.11-eksbuild.1"
+  }
+  ebs_csi_driver = {
+    version            = "v1.19.0-eksbuild.2"
+    storage_class_name = "vessl-ebs"
   }
 
-  helm_values = {
-    "metricsExporters.dcgmExporter.enabled" = "false"
-    "nvidia-device-plugin.enabled"          = "false"
-    "nvidia-device-plugin.nfd.enabled"      = "false"
-    "nvidia-device-plugin.gfd.enabled"      = "false"
-    "localPathProvisioner.enabled"          = "false"
+  #  external_dns = {
+  #    cluster_domain = local.full_domain
+  #    namespace      = "kube-system"
+  #    version        = "1.13.0"
+  #    sources        = ["service"]
+  #  }
+  #  ingress_nginx = {
+  #    namespace = "kube-system"
+  #    version   = "4.7.0"
+  #    service_annotations = {
+  #      "external-dns.alpha.kubernetes.io/hostname"                            = "*.${local.full_domain}"
+  #      "service.beta.kubernetes.io/aws-load-balancer-type"                    = "external"
+  #      "service.beta.kubernetes.io/aws-load-balancer-scheme"                  = "internet-facing"
+  #      "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type"         = "ip"
+  #      "service.beta.kubernetes.io/aws-load-balancer-backend-protocol"        = "tcp"
+  #      "service.beta.kubernetes.io/aws-load-balancer-ssl-ports"               = "https"
+  #      "service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout" = "60"
+  #      "service.beta.kubernetes.io/aws-load-balancer-subnets"                 = join(",", local.public_subnet_ids)
+  #      "service.beta.kubernetes.io/aws-load-balancer-ssl-cert"                = aws_acm_certificate.ingress.arn
+  #      "service.beta.kubernetes.io/aws-load-balancer-attributes"              = "load_balancing.cross_zone.enabled=true"
+  #    }
+  #    ssl_termination = true
+  #  }
+  load_balancer_controller = {
+    namespace = "kube-system"
+    version   = "1.4.5"
   }
+  cluster_autoscaler = {
+    namespace = "kube-system"
+    version   = "9.24.0"
+  }
+  metrics_server = {
+    version = "3.10.0"
+  }
+
+  tags = var.tags
 }
