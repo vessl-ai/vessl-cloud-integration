@@ -1,0 +1,11 @@
+cluster_name             = ""
+cluster_version          = "1.25"
+vpc_id                   = ""
+private_subnets          = {}
+public_subnets           = {}
+cluster_master_iam_users = []
+cluster_master_iam_roles = {}
+tags = {
+  vessl   = "true"
+  example = "true"
+}

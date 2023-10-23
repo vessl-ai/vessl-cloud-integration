@@ -8,11 +8,6 @@ variable "cluster_version" {
   description = "The version of the cluster"
 }
 
-variable "cluster_agent_namespace" {
-  type        = string
-  description = "The namespace where VESSL cluster agent will be installed"
-}
-
 variable "vpc_id" {
   type        = string
   description = "The VPC ID"
@@ -38,16 +33,6 @@ variable "cluster_master_iam_roles" {
   type        = map(string)
   description = "The IAM roles to hold system:masters access. See also: https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html"
   default     = {}
-}
-
-variable "local_storage_class_name" {
-  type        = string
-  description = "The name of the local storage class to use for the cluster"
-}
-
-variable "vessl_agent_access_token" {
-  type        = string
-  description = "The access token for the VESSL cluster agent"
 }
 
 variable "tags" {
