@@ -97,6 +97,12 @@ variable "instance_market_options" {
   default     = {}
 }
 
+variable "kms_key_arn" {
+  type        = string
+  description = "The ARN of the KMS key to use for encryption of the EBS volume"
+  default     = null
+}
+
 variable "tags" {
   type        = map(string)
   description = "The tags to apply to the node group"

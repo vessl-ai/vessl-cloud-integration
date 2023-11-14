@@ -41,3 +41,7 @@ output "cluster_security_group_id" {
 output "cluster_node_iam_instance_profile_arn" {
   value = aws_iam_instance_profile.node_group.arn
 }
+
+output "kms_key_arn" {
+  value = module.kms.key_arn
+}
