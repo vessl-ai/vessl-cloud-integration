@@ -66,7 +66,7 @@ module "node_group" {
         volume_type           = "gp3"
         iops                  = 3000 # Baseline
         throughput            = 125  # Baseline
-        encrypted             = true
+        encrypted             = var.kms_key_arn != null ? true : false
         kms_key_id            = var.kms_key_arn
         delete_on_termination = true
       }
